@@ -60,6 +60,7 @@ struct RecipeList: View {
                         Text(showFavorites ? "Favorites" : "All")
                             .font(.caption)
                     }.toggleStyle(.switch)
+                        .tint(.red)
                 }
             }
         }
