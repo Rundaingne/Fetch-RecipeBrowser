@@ -36,6 +36,7 @@ struct Loader: View {
                 .padding(.bottom)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(RoundedRectangle(cornerRadius: 8).fill(Color.gray.opacity(0.5)))
+        .background(RoundedRectangle(cornerRadius: 8).fill(LinearGradient(colors: [.black, .gray.opacity(0.9)], startPoint: .topLeading, endPoint: .bottomTrailing)))
+        .shadow(radius: 4)
     }
 }

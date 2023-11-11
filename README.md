@@ -12,5 +12,7 @@ Several features for this project:
 8. Along with the above, XCode Cloud integration is enabled with a quick and simple workflow. Any time changes
     are made to the develop branch in GitHub or pull requests against it are created, the testing suite is run.
 
+The Activity Indicator on the Loader that appears while waiting for API calls to complete is just a UIActivityIndicator that is being used in SwiftUI via a UIViewRepresentable.
+
 Happy testing! Please let me know if you have any questions, I will be happy to answer them.
  
