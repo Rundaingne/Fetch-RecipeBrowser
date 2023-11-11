@@ -42,7 +42,7 @@ struct RecipeCell: View {
         }
         .padding(4)
         .frame(maxWidth: .infinity)
-        .background(RoundedRectangle(cornerRadius: 6).fill(LinearGradient(colors: [.gray, .gray.opacity(0.5)], startPoint: .topLeading, endPoint: .bottomTrailing)))
+        .background(RoundedRectangle(cornerRadius: 6).fill(LinearGradient(colors: [.black, .gray.opacity(0.5)], startPoint: .topLeading, endPoint: .bottomTrailing)))
         .shadow(radius: 4)
         .padding(4)
         
