@@ -13,6 +13,7 @@ class RecipeViewModel: NSObject, ObservableObject {
     
     @Published var viewState: State = .initialize
     @Published var details = [DisplayDetails]()
+    @Published var fetchError: Error?
         
     enum State {
         case initialize
@@ -27,13 +28,14 @@ class RecipeViewModel: NSObject, ObservableObject {
         }
     }
     
-    private func fetchRecipes() async {
+    func fetchRecipes() async {
         do {
             let meals: Meals = try await URLService.getData(from: .recipes)
             async let recipes = DisplayRecipe.makeGroup(from: meals.meals)
             viewState = await .results(recipes)            
         } catch {
             print("Error fetching recipes. Rip. Error: \(error), \(error.localizedDescription)")
+            self.fetchError = error
         }
     }
     
@@ -74,6 +76,7 @@ class RecipeViewModel: NSObject, ObservableObject {
             self.details.append(newDetails)
         } catch {
             print("Error fetching details for \(recipe.name): \(error), \(error.localizedDescription)")
+            self.fetchError = error
         }
     }
 }
