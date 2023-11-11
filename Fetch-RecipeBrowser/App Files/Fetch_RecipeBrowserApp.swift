@@ -12,6 +12,7 @@ struct Fetch_RecipeBrowserApp: App {
     var body: some Scene {
         WindowGroup {
             RecipeList()
+                .foregroundStyle(.white)
         }
     }
 }

@@ -33,7 +33,6 @@ struct Loader: View {
             Text("Loading Recipes...")
                 .padding()
                 .multilineTextAlignment(.center)
-                .foregroundStyle(.white)
             
             ActivityIndicator(shouldAnimate: .constant(true), style: .large)
                 .padding(.bottom)
