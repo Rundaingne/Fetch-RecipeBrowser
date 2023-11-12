@@ -19,11 +19,7 @@ struct RecipeList: View {
     @State var selectedCategory: MealCategory = .dessert
     @State var showCategories = false
     @State var searchText = ""
-    
-    var favorites: [DisplayRecipe] {
-        return recipes.filter({ UserDefaults.standard.bool(forKey: $0.id) == true })
-    }
-    
+        
     var filteredRecipes: [DisplayRecipe] {
         if showFavorites {
             if searchText.isEmpty { return favorites }
@@ -97,7 +93,7 @@ struct RecipeList: View {
             .background(Color.primary.opacity(0.5))
             .popover(isPresented: $showCategories, content: {
                 VStack {
-                    Text("Select a Category")
+                    Text("Select a Category to search")
                     Divider()
                     
                     List {
@@ -110,10 +106,13 @@ struct RecipeList: View {
                             }
                             .buttonStyle(.plain)
                             .listRowSeparatorTint(.cyan)
+                            .listRowBackground(Color.clear)
                         }
                     }
+                    .listStyle(.plain)
                 }
                 .padding(8)
+                .background(Color.black)
             })
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -128,6 +127,7 @@ struct RecipeList: View {
                         showCategories.toggle()
                     } label: {
                         Text(selectedCategory.rawValue)
+                            .foregroundStyle(.mint)
                     }
                     .buttonStyle(.plain)
                 }

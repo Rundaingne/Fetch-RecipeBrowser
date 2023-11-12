@@ -49,7 +49,7 @@ struct RecipeDetail: View {
                         ScrollView(.vertical, showsIndicators: true) {
                             Text(details.instructions)
                         }
-                        .padding(.bottom)
+                        .padding()
                         .background(RoundedRectangle(cornerRadius: 6).fill(LinearGradient(colors: [.black, .gray.opacity(0.4)], startPoint: .topLeading, endPoint: .bottomTrailing)))
                         .shadow(radius: 4)
                     }
