@@ -8,10 +8,12 @@
 import SwiftUI
 
 struct SearchBar: View {
+    /// Make a custom search bar with a simple rounded rectangular background.
     
     var placeholder: String
     @Binding var text: String
     
+    /// Doesn't really do anything here, but can be useful if you wanted to move between FocusedStates/FocusField, etc. Or just use the @Focused property wrapper instead, eh.
     var onSubmit: () -> Void
     
     var body: some View {

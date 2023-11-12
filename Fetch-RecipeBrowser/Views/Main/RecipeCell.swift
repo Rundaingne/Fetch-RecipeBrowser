@@ -25,6 +25,7 @@ struct RecipeCell: View {
             HStack {
                 Button {
                     favorited.toggle()
+                    model.toggleFavorite(recipe, isFavorite: favorited)
                 } label: {
                     Image(systemName: favorited ? "heart.fill" : "heart")
                         .imageScale(.large)
@@ -46,6 +47,12 @@ struct RecipeCell: View {
         .background(RoundedRectangle(cornerRadius: 6).fill(LinearGradient(colors: [.black, .gray.opacity(0.5)], startPoint: .topLeading, endPoint: .bottomTrailing)))
         .shadow(radius: 4)
         .padding(4)
+        
+        .onAppear {
+            if model.favorites.contains(where: { $0.id == recipe.id }) {
+                favorited = true
+            }
+        }
                 
         .onDisappear {
             UserDefaults.standard.setValue(favorited, forKey: recipe.id)

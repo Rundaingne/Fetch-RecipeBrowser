@@ -28,7 +28,7 @@ struct URLService {
             print("Real url is: \(String(describing: realURL))")
             
             var request = URLRequest(url: realURL!)
-            request.timeoutInterval = 5
+            request.timeoutInterval = 3
             let rData = try await URLSession.shared.data(for: request)
             let response = try JSONDecoder().decode(T.self, from: rData.0)
             return response

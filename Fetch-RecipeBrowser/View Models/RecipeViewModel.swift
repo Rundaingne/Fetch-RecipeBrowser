@@ -15,7 +15,7 @@ class RecipeViewModel: NSObject, ObservableObject {
     @Published var details = [DisplayDetails]()
     @Published var fetchError: Error?
     
-    @Published var favorites = [DisplayRecipe]()
+    @Published private(set) var favorites = [DisplayRecipe]()
         
     enum State {
         case initialize
@@ -23,10 +23,32 @@ class RecipeViewModel: NSObject, ObservableObject {
     }
     
     override init() {
-        /// You could fetch when the view loads, or you can do it when this object is created. Or, we could make this an @EnvironmentObject and put it in the .app file, and do the fetch there. Just make sure however you do it that there is a loading screen. Nothing turns a user off faster than a UI that appears to be slow and unresponsive. Also make sure to do threading appropriately. if not using async await style code with Tasks, then use GCD and DispatchQueues correctly.
+        /// You could fetch when the view loads, or you can do it when this object is created. Or, we could make this an @EnvironmentObject and put it in the .app file, and do the fetch there. Just make sure however you do it that there is a loading screen. Nothing turns a user off faster than a UI that appears to be slow and unresponsive. 
+        /// Also make sure to do threading appropriately. if not using async await style code with Tasks, then use GCD and DispatchQueues correctly.
+        /// Could also do  an Operation Queue. But async-await style code replaces that pretty effectively.
         super.init()
         Task {
             await fetchRecipes()
+        }
+    }
+    
+    func setFavorites(for recipes: [DisplayRecipe]) {
+        for recipe in recipes {
+            let fav = UserDefaults.standard.bool(forKey: recipe.id)
+            if fav {
+                print("Recipe is favorited!!")
+                self.favorites.append(recipe)
+            }
+        }
+    }
+    
+    func toggleFavorite(_ recipe: DisplayRecipe, isFavorite: Bool) {
+        if !isFavorite {
+            self.favorites.removeAll(where: { $0.id == recipe.id })
+        } else {
+            if !self.favorites.contains(where: { $0.id == recipe.id }) {
+                self.favorites.append(recipe)
+            }
         }
     }
     
@@ -35,7 +57,8 @@ class RecipeViewModel: NSObject, ObservableObject {
             viewState = .initialize
             let meals: Meals = try await URLService.getData(from: .recipes, and: category)
             async let recipes = DisplayRecipe.makeGroup(from: meals.meals)
-            viewState = await .results(recipes)            
+            await self.setFavorites(for: recipes)
+            viewState = await .results(recipes)
         } catch {
             print("Error fetching recipes. Rip. Error: \(error), \(error.localizedDescription)")
             self.fetchError = error
@@ -48,34 +71,7 @@ class RecipeViewModel: NSObject, ObservableObject {
             if self.details.contains(where: { $0.name == recipe.name }) { return }
             let detail: MealDetails = try await URLService.getData(from: .details, with: recipe.id)
             guard let details = detail.meals.first else { return }
-            var ingredientGroup: [(String?, String?)] = [
-                (details.strMeasure1, details.strIngredient1),
-                (details.strMeasure2, details.strIngredient2),
-                (details.strMeasure3, details.strIngredient3),
-                (details.strMeasure4, details.strIngredient4),
-                (details.strMeasure5, details.strIngredient5),
-                (details.strMeasure6, details.strIngredient6),
-                (details.strMeasure7, details.strIngredient7),
-                (details.strMeasure8, details.strIngredient8),
-                (details.strMeasure9, details.strIngredient9),
-                (details.strMeasure10, details.strIngredient10),
-                (details.strMeasure11, details.strIngredient11),
-                (details.strMeasure12, details.strIngredient12),
-                (details.strMeasure13, details.strIngredient13),
-                (details.strMeasure14, details.strIngredient14),
-                (details.strMeasure15, details.strIngredient15),
-                (details.strMeasure16, details.strIngredient16),
-                (details.strMeasure17, details.strIngredient17),
-                (details.strMeasure18, details.strIngredient18),
-                (details.strMeasure19, details.strIngredient19),
-                (details.strMeasure20, details.strIngredient20)
-            ]
-            ingredientGroup.removeAll(where: { $0.0 == nil || $0.1 == nil })
-            ingredientGroup.removeAll(where: { $0.0 == "" || $0.1 == "" })
-            
-            let ingredients: [String] = ingredientGroup.map({ "\($0.0 ?? "") \($0.1 ?? "")"})
-            
-            let newDetails = DisplayDetails(name: details.strMeal ?? "", instructions: details.strInstructions ?? "", youtubeLink: details.strYoutube ?? "", articleLink: details.strSource ?? "", ingredients: ingredients)
+            let newDetails = DisplayDetails.make(from: details)
             self.details.append(newDetails)
         } catch {
             print("Error fetching details for \(recipe.name): \(error), \(error.localizedDescription)")

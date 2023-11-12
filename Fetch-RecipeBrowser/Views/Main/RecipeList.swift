@@ -22,8 +22,8 @@ struct RecipeList: View {
         
     var filteredRecipes: [DisplayRecipe] {
         if showFavorites {
-            if searchText.isEmpty { return favorites }
-            return favorites.filter({ $0.name.contains(searchText) })
+            if searchText.isEmpty { return model.favorites }
+            return model.favorites.filter({ $0.name.contains(searchText) })
         } else {
             if searchText.isEmpty { return recipes }
             return recipes.filter({ $0.name.contains(searchText) })
@@ -45,7 +45,7 @@ struct RecipeList: View {
                                 NavigationLink {
                                     RecipeDetail(model: model, recipe: recipe)
                                 } label: {
-                                    RecipeCell(recipe: recipe)
+                                    RecipeCell(model: model, recipe: recipe)
                                 }
                                 .buttonStyle(.plain)
                             }
@@ -68,27 +68,8 @@ struct RecipeList: View {
                     .frame(width: 200, height: 200)
                     .isHidden(!recipes.isEmpty)
                 
-                VStack {
-                    Text("Failed to load recipes, try again.")
-                        .padding()
-                        .multilineTextAlignment(.center)
-                    
-                    Button {
-                        model.fetchError = nil
-                        Task {
-                            await model.fetchRecipes()
-                        }
-                    } label: {
-                        Text("Okay")
-                            .padding()
-                            .background(RoundedRectangle(cornerRadius: 4).fill(Color.cyan.opacity(0.2)))
-                    }.buttonStyle(.plain)
-
-                }
-                .frame(width: screenSize.width * 0.5, height: screenSize.height * 0.5)
-                .background(RoundedRectangle(cornerRadius: 8).fill(LinearGradient(colors: [.black, .gray.opacity(0.9)], startPoint: .topLeading, endPoint: .bottomTrailing)))
-                .shadow(radius: 4)
-                .isHidden(model.fetchError == nil)
+                LoadFailPopup(model: model, isDetails: false)
+                    .isHidden(model.fetchError == nil)
             }
             .background(Color.primary.opacity(0.5))
             .popover(isPresented: $showCategories, content: {
