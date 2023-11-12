@@ -68,9 +68,6 @@ struct RecipeDetail: View {
                 }
                 .multilineTextAlignment(.center)
                 .navigationTitle(recipe.name)
-                .onChange(of: selectedTag) { _ in
-                    model.setNotes(for: recipe, notes)
-                }
             }
             
             Loader(category: "")
@@ -85,6 +82,9 @@ struct RecipeDetail: View {
                 await model.fetchDetails(for: recipe)
                 self.notes = model.getNotes(for: recipe)
             }
+        }
+        .onDisappear {
+            model.setNotes(for: recipe, notes)
         }
     }
 }
