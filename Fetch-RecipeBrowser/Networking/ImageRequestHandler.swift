@@ -11,7 +11,7 @@ typealias Paramaters = [String: String]
 
 struct ImageRequestHandler {
     
-    /// Normally, for images being loaded from a database like S3, there would be a multipart request handler to ensure the large files don't return unless the download completed.. But I would need to know more details for that, so for now it's just a regular http get request.
+    /// Normally, for images being loaded from a database like S3, there would be a multipart request handler to ensure the large files don't return unless the download completed. But I would need to know more details for that, so for now it's just a regular http get request.
     
     static let shared = ImageRequestHandler()
     private init() {}

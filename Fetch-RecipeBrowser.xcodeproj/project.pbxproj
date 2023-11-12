@@ -143,10 +143,10 @@
 		6D597E372AFF43B4000D2B7F /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				6D597E6A2B004007000D2B7F /* MealCategory.swift */,
 				6D597E412AFF45B1000D2B7F /* Recipe.swift */,
 				6D597E522AFFFFDC000D2B7F /* Detail.swift */,
 				6D597E5A2B00129E000D2B7F /* Display */,
-				6D597E6A2B004007000D2B7F /* MealCategory.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";

@@ -16,6 +16,7 @@ class RecipeViewModel: NSObject, ObservableObject {
     @Published var fetchError: Error?
     
     @Published private(set) var favorites = [DisplayRecipe]()
+    @Published private(set) var recipeNotes = [String: String]()
         
     enum State {
         case initialize
@@ -29,7 +30,17 @@ class RecipeViewModel: NSObject, ObservableObject {
         super.init()
         Task {
             await fetchRecipes()
+            loadRecipeNotes()
         }
+    }
+    
+    func setNotes(for recipe: DisplayRecipe, _ notes: String) {
+        recipeNotes[recipe.id] = notes
+        self.saveToPersistentStorage()
+    }
+    
+    func getNotes(for recipe: DisplayRecipe) -> String {
+        return recipeNotes[recipe.id] ?? ""
     }
     
     func setFavorites(for recipes: [DisplayRecipe]) {
@@ -76,6 +87,35 @@ class RecipeViewModel: NSObject, ObservableObject {
         } catch {
             print("Error fetching details for \(recipe.name): \(error), \(error.localizedDescription)")
             self.fetchError = error
+        }
+    }
+    
+    private func fileURL() -> URL {
+        let urls = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        let fileName = "recipeNotes.json"
+        let documentsDirectoryURL = urls[0].appendingPathComponent(fileName)
+        return documentsDirectoryURL
+    }
+    
+    private func loadRecipeNotes() {
+        let decoder = JSONDecoder()
+        do {
+            let data = try Data(contentsOf: fileURL())
+            let recipeNotes = try decoder.decode([String: String].self, from: data)
+            print("Recipe notes: \(recipeNotes)")
+            self.recipeNotes = recipeNotes
+        } catch let error {
+            print("There was an error loading notes: \(error)")
+        }
+    }
+    
+    private func saveToPersistentStorage() {
+        let encoder = JSONEncoder()
+        do {
+            let data = try encoder.encode(recipeNotes)
+            try data.write(to: fileURL())
+        } catch let error {
+            print("There was an error saving notes: \(error)")
         }
     }
 }
