@@ -28,9 +28,11 @@ struct ActivityIndicator: UIViewRepresentable {
 
 struct Loader: View {
     
+    var category: String
+    
     var body: some View {
         VStack {
-            Text("Loading Recipes...")
+            Text("Loading \(category) Recipes...")
                 .padding()
                 .multilineTextAlignment(.center)
             
