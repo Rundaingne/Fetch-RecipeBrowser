@@ -59,7 +59,7 @@ struct RecipeDetail: View {
                 .navigationTitle(recipe.name)
             }
             
-            Loader()
+            Loader(category: "")
                 .isHidden(details != nil)
             
             VStack {

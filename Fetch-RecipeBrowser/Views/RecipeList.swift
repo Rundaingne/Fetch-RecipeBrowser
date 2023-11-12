@@ -16,9 +16,22 @@ struct RecipeList: View {
     
     @State var recipes = [DisplayRecipe]()
     @State var showFavorites = false
+    @State var selectedCategory: MealCategory = .dessert
+    @State var showCategories = false
+    @State var searchText = ""
     
     var favorites: [DisplayRecipe] {
         return recipes.filter({ UserDefaults.standard.bool(forKey: $0.id) == true })
+    }
+    
+    var filteredRecipes: [DisplayRecipe] {
+        if showFavorites {
+            if searchText.isEmpty { return favorites }
+            return favorites.filter({ $0.name.contains(searchText) })
+        } else {
+            if searchText.isEmpty { return recipes }
+            return recipes.filter({ $0.name.contains(searchText) })
+        }
     }
     
     let gridRows: [GridItem] = Array(repeating: .init(.fixed(screenSize.width * 0.55), spacing: screenSize.height / 51.2, alignment: .leading), count: 3)
@@ -26,30 +39,36 @@ struct RecipeList: View {
     var body: some View {
         NavigationView {
             ZStack {
-                ScrollView(.horizontal, showsIndicators: true) {
-                    LazyHGrid(rows: gridRows, spacing: screenSize.height / 32, content: {
-                        ForEach(showFavorites ? favorites : recipes) { recipe in
-                            NavigationLink {
-                                RecipeDetail(model: model, recipe: recipe)
-                            } label: {
-                                RecipeCell(recipe: recipe)
+                VStack {
+                    SearchBar(placeholder: "Search for a recipe...", text: $searchText) { }
+                        .padding([.horizontal, .top])
+                    
+                    ScrollView(.horizontal, showsIndicators: true) {
+                        LazyHGrid(rows: gridRows, spacing: screenSize.height / 32, content: {
+                            ForEach(filteredRecipes) { recipe in
+                                NavigationLink {
+                                    RecipeDetail(model: model, recipe: recipe)
+                                } label: {
+                                    RecipeCell(recipe: recipe)
+                                }
+                                .buttonStyle(.plain)
                             }
-                            .buttonStyle(.plain)
+                        })
+                    }
+                    .navigationTitle("Recipes")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .onReceive(model.$viewState, perform: { state in
+                        switch state {
+                        case .initialize:
+                            break
+                        case .results(let recipes):
+                            self.recipes = recipes.sorted(by: { ($0.name) < ($1.name) })
                         }
                     })
                 }
-                .navigationTitle("Recipes")
-                .navigationBarTitleDisplayMode(.inline)
-                .onReceive(model.$viewState, perform: { state in
-                    switch state {
-                    case .initialize:
-                        break
-                    case .results(let recipes):
-                        self.recipes = recipes.sorted(by: { ($0.name) < ($1.name) })
-                    }
-                })
+                .keyboardAdaptive()
                 
-                Loader()
+                Loader(category: selectedCategory.rawValue)
                     .frame(width: 200, height: 200)
                     .isHidden(!recipes.isEmpty)
                 
@@ -74,9 +93,28 @@ struct RecipeList: View {
                 .background(RoundedRectangle(cornerRadius: 8).fill(LinearGradient(colors: [.black, .gray.opacity(0.9)], startPoint: .topLeading, endPoint: .bottomTrailing)))
                 .shadow(radius: 4)
                 .isHidden(model.fetchError == nil)
-                
             }
             .background(Color.primary.opacity(0.5))
+            .popover(isPresented: $showCategories, content: {
+                VStack {
+                    Text("Select a Category")
+                    Divider()
+                    
+                    List {
+                        ForEach(MealCategory.allCases, id: \.self) { cat in
+                            Button {
+                                selectedCategory = cat
+                                showCategories.toggle()
+                            } label: {
+                                Text(cat.rawValue)
+                            }
+                            .buttonStyle(.plain)
+                            .listRowSeparatorTint(.cyan)
+                        }
+                    }
+                }
+                .padding(8)
+            })
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Toggle(isOn: $showFavorites.animation(.smooth)) {
@@ -85,9 +123,23 @@ struct RecipeList: View {
                     }.toggleStyle(.switch)
                         .tint(.red)
                 }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showCategories.toggle()
+                    } label: {
+                        Text(selectedCategory.rawValue)
+                    }
+                    .buttonStyle(.plain)
+                }
             }
         }
         .tint(.black)
+        .onChange(of: selectedCategory) { cat in
+            self.recipes = []
+            Task {
+                await model.fetchRecipes(category: cat)
+            }
+        }
     }
 }
 

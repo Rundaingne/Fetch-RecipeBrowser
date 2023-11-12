@@ -14,6 +14,8 @@ class RecipeViewModel: NSObject, ObservableObject {
     @Published var viewState: State = .initialize
     @Published var details = [DisplayDetails]()
     @Published var fetchError: Error?
+    
+    @Published var favorites = [DisplayRecipe]()
         
     enum State {
         case initialize
@@ -28,9 +30,10 @@ class RecipeViewModel: NSObject, ObservableObject {
         }
     }
     
-    func fetchRecipes() async {
+    func fetchRecipes(category: MealCategory = .dessert) async {
         do {
-            let meals: Meals = try await URLService.getData(from: .recipes)
+            viewState = .initialize
+            let meals: Meals = try await URLService.getData(from: .recipes, and: category)
             async let recipes = DisplayRecipe.makeGroup(from: meals.meals)
             viewState = await .results(recipes)            
         } catch {
