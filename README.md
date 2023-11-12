@@ -13,6 +13,8 @@ Several features for this project:
     are made to the develop branch in GitHub or pull requests against it are created, the testing suite is run.
 9. The Activity Indicator on the Loader that appears while waiting for API calls to complete is just a UIActivityIndicator that is being used in SwiftUI via a UIViewRepresentable.
 10. There is a 5 second timeout interval on the API requests. A basic retry logic popup will prompt the user to try reloading the recipes/recipe details. 
+11. Users can search for recipes within different categories by selecting the category name in the top right and selecting a new one.
+12. Users can search within a category or within favorites of that category, using the search bar, for a recipe name. 
 
 Happy testing! Please let me know if you have any questions, I will be happy to answer them.
  
