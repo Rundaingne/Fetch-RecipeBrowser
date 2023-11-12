@@ -10,6 +10,8 @@ import SwiftUI
 struct RecipeDetail: View {
     
     @ObservedObject private var model: RecipeViewModel
+    @Environment(\.scenePhase) var scenePhase
+
     var recipe: DisplayRecipe
     
     @State var selectedTag = 0
@@ -60,11 +62,31 @@ struct RecipeDetail: View {
                             .padding()
                             .tag(0)
                             
+                            /// Text editor kind of sucks still, but I'll use it here for now for a quick notes section. Would probably substitute this out in the future for a UIViewRepresentable TextView.
                             TextEditor(text: $notes)
                                 .padding()
                                 .tag(1)
+                            
                         }.tabViewStyle(.page)
                     }
+                    HStack {
+                        if !details.youtubeLink.isEmpty {
+                            Link(destination: URL(string: details.youtubeLink)!) {
+                                Text("Watch on YouTube")
+                                    .foregroundStyle(.cyan.opacity(0.9))
+                            }
+                        }
+                        Spacer()
+                        if !details.articleLink.isEmpty {
+                            Link(destination: URL(string: details.articleLink)!) {
+                                Text("View article")
+                                    .foregroundStyle(.cyan.opacity(0.9))
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
+                    .padding(.vertical, 6)
+
                 }
                 .multilineTextAlignment(.center)
                 .navigationTitle(recipe.name)
@@ -85,6 +107,15 @@ struct RecipeDetail: View {
         }
         .onDisappear {
             model.setNotes(for: recipe, notes)
+        }
+        
+        .onChange(of: scenePhase) { phase in
+            switch phase {
+            case .inactive, .background:
+                model.setNotes(for: recipe, notes)
+            default:
+                break
+            }
         }
     }
 }

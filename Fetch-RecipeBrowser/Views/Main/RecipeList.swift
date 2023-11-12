@@ -30,7 +30,7 @@ struct RecipeList: View {
         }
     }
     
-    let gridRows: [GridItem] = Array(repeating: .init(.fixed(screenSize.width * 0.55), spacing: screenSize.height / 51.2, alignment: .leading), count: 3)
+    let gridRows: [GridItem] = Array(repeating: .init(.fixed(screenSize.width * 0.52), spacing: screenSize.height / 51.2, alignment: .leading), count: 3)
     
     var body: some View {
         NavigationView {
@@ -38,6 +38,8 @@ struct RecipeList: View {
                 VStack {
                     SearchBar(placeholder: "Search for a recipe...", text: $searchText) { }
                         .padding([.horizontal, .top])
+                    
+                    Divider()
                     
                     ScrollView(.horizontal, showsIndicators: true) {
                         LazyHGrid(rows: gridRows, spacing: screenSize.height / 32, content: {
