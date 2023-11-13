@@ -2,6 +2,8 @@
 
 Several features for this project:
 
+Project has several notes/documentation spots within it. Search for a triple slash "///" and you will find them.
+
 1. Scroll horizontally to view various recipes in the Grid.
 2. Tap the heart icon on any recipe to favorite it. If you exit the app, it will save your favorites.
 3. To view only favorites or all recipes, toggle the switch in the top left.
